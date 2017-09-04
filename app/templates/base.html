@@ -1,0 +1,81 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block head %}
+{{ moment.include_jquery() }}
+{{ moment.include_moment() }}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://127.0.0.1:5000">知乎</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="http://127.0.0.1:5000">首页</a></li>
+                <li><a href="http://127.0.0.1:5000">发现</a></li>
+                <li><a href="http://127.0.0.1:5000">话题</a></li>
+                <li><a href="http://127.0.0.1:5000">搜索</a></li>
+                <li><a href="http://127.0.0.1:5000">与世界分享你刚编的故事</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                {% if current_user.can(Permission.MODERATE_COMMENTS) %}
+                <li><a href="{{ url_for('main.moderate') }}">Moderate Comments</a></li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="">
+
+                        <!--判断条件中的变量 current_user 由 Flask-Login 定义，且在视图函数和模板中自动可用。-->
+                        <!--这个变量的值是当前登录的用户，如果用户尚未登录，则是一个匿名用户代理对象。如果-->
+                        <!--是匿名用户， is_authenticated() 方法返回 False 。所以这个方法可用来判断当前用户是否已经登录。-->
+                        {% if current_user.is_authenticated %}
+                            {{ current_user.username }}
+                        {% else %}
+                            Account
+                        {% endif %}
+
+                        <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('main.user', username=current_user.username) }}">我的主页</a></li>
+                        <li><a href="">设置</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">退出</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li><a href="{{ url_for('auth.login') }}">登录</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+</div>
+{% endblock %}
