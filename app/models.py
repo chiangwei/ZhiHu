@@ -9,6 +9,15 @@ from markdown import markdown
 import bleach
 from app.exceptions import ValidationError
 
+#权限常量
+class Permission:
+    #用十六进制来表示
+    FOLLOW = 0x01
+    COMMENT = 0x02
+    WRITE_ARTICLES = 0x04
+    MODERATE_COMMENTS = 0x08
+    ADMINISTER = 0x80
+
 #角色
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -19,8 +28,10 @@ class Role(db.Model):
     default = db.Column(db.Boolean, default=False, index=True)
     permissions = db.Column(db.Integer)
 
+    #在数据库中创建三个角色
     @staticmethod
     def insert_roles():
+        # | 是按位或运算符：只要对应的二个二进位有一个为1时，结果位就为1。
         roles = {
             'User': (Permission.FOLLOW |
                      Permission.COMMENT |
@@ -192,8 +203,27 @@ class User(UserMixin, db.Model):
         db.session.add(self)
         return True
 
+    def generate_email_change_token(self,new_email,expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'],expiration)
+        return s.dumps({'change_email':self.id,'new_email':new_email})
 
-
+    #修改邮箱地址
+    def change_email(self,token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('change_email') != self.id:
+            return False
+        new_email = data.get('new_email')
+        if new_email is None:
+            return False
+        if self.query.filter_by(email=new_email).first() is not None:
+            return False
+        self.email=new_email
+        db.session.add(self)
+        return True
 
     def generate_auth_token(self, expiration):
         s = Serializer(current_app.config['SECRET_KEY'],
@@ -271,14 +301,6 @@ class Post(db.Model):
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'),tags=allowed_tags, strip=True))
 db.event.listen(Post.body, 'set', Post.on_change_body)
 
-
-#权限常量
-class Permission:
-    FOLLOW = 0x01
-    COMMENT = 0x02
-    WRITE_ARTICLES = 0x04
-    MODERATE_COMMENTS = 0x08
-    ADMINISTER = 0x80
 
 class Comment(db.Model):
     __tablename__ = 'comments'

@@ -2,7 +2,7 @@ from flask import render_template, redirect, request, url_for, flash
 from flask_login import login_user,logout_user,login_required,current_user
 from . import auth
 from ..models import User
-from .forms import LoginForm,RegisteationForm,ChangePasswordForm,PasswordResetForm,PasswordResetRequestForm
+from .forms import LoginForm,RegisteationForm,ChangePasswordForm,PasswordResetForm,PasswordResetRequestForm,ChangeEmailForm
 from .. import db
 from ..email import send_email
 
@@ -139,3 +139,28 @@ def password_reset(token):
             return redirect(url_for('main.index'))
     return render_template('auth/reset_password.html',form=form)
 
+#发送修改电子邮件的地址的请求
+@auth.route('/change-email',methods=['GET','POST'])
+@login_required
+def change_email_request():
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.password.data):
+            new_email = form.email.data
+            token = current_user.generate_email_change_token(new_email)
+            send_email(new_email,u'确认你的新邮箱地址','auth/email/change_email',user=current_user,token=token)
+            flash(u'一封修改邮箱的确认邮件已经发给你了呦!')
+            return redirect(url_for('main.index'))
+        else:
+            flash(u'无效的邮箱或者密码')
+    return render_template("auth/change_email.html",form=form)
+
+#修改邮箱的实际操作过程
+@auth.route('/change_email/<token>')
+@login_required
+def change_email(token):
+    if current_user.change_email(token):
+        flash(u'邮箱地址更新成功!')
+    else:
+        flash(u'邮箱地址更新失败!')
+    return redirect(url_for('main.index'))
