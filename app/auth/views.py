@@ -52,16 +52,18 @@ def logout():
 def register():
     form = RegisteationForm()
     if form.validate_on_submit():
+        print("come in")
         user = User(
             email=form.email.data,
             username=form.username.data,
             password=form.password.data
         )
+        print(user)
         db.session.add(user)
         #注意，即便通过配置，程序已经可以在请求末尾自动提交数据库变化，这里也要添加db.session.commit() 调用。问题在于，提交数据库之后才能赋予新用户 id 值，而确认令牌需要用到 id ，所以不能延后提交。
         db.session.commit()
         token = user.generate_confirmtion_token()
-        send_email(user.email,'请确认您的账户邮箱','auth/email/confirm',user=user,token=token)
+        send_email(user.email,u'请确认您的账户邮箱','auth/email/confirm',user=user,token=token)
         flash('一封确认邮件已经发送到您的邮箱')
         flash('账号注册成功!')
         return redirect(url_for('main.index'))
@@ -73,7 +75,8 @@ def register():
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmtion_token()
-    send_email(current_user.email, '请确认您的账户邮箱', 'auth/email/confirm', user=current_user, token=token)
+    #第二个参数是指定templates里面的模版
+    send_email(current_user.email, u'请确认您的账户邮箱', 'auth/email/confirm', user=current_user, token=token)
     flash('一封确认邮件已经发送到您的邮箱')
     return redirect(url_for('main.index'))
 
