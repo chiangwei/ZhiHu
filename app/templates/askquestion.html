@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}知乎-与世界分享你刚编的故事{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
+</div>
+
+<div>
+{% if current_user.can(Permission.WRITE_ARTICLES) %}
+{{ wtf.quick_form(form) }}
+{% endif %}
+
+</div>
+
+{% endblock %}
+

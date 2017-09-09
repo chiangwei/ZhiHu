@@ -1,39 +1,134 @@
-<ul class="posts">
-    {% for post in posts %}
-    <li class="post">
-        <div class="post-thumbnail">
-            <a href="{{ url_for('.user', username=post.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src=" ">
-            </a>
-        </div>
-        <div class="post-content">
-            <div class="post-date">{{ moment(post.timestamp).fromNow() }}</div>
-            <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
-            <div class="post-body">
-                {% if post.body_html %}
-                    {{ post.body_html | safe }}
-                {% else %}
-                    {{ post.body }}
-                {% endif %}
-            </div>
-            <div class="post-footer">
-                {% if current_user == post.author %}
-                <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-primary">修改</span>
-                </a>
-                {% elif current_user.is_administrator() %}
-                <a href="{{ url_for('.edit', id=post.id) }}">
-                    <span class="label label-danger">修改 [Admin]</span>
-                </a>
-                {% endif %}
-                <a href="{{ url_for('.post', id=post.id) }}">
-                    <span class="label label-default">分享</span>
-                </a>
-                <a href="{{ url_for('.post', id=post.id) }}#comments">
-                    <span class="label label-primary">评论 {{ post.comments.count() }} </span>
-                </a>
-            </div>
-        </div>
-    </li>
-    {% endfor %}
-</ul>
+<div data-type="daily" data-zop-feedlist="">
+{% for post in posts %}
+<div class="explore-feed feed-item" data-offset="1" data-za-module="AnswerItem" data-za-index="">
+<h2><a class="question_link" href="/question/64028409/answer/226868219" target="_blank" data-id="17837366" data-za-element-name="Title">
+{{ post.title }}
+</a></h2>
+<div tabindex="-1" class="zm-item-answer " itemscope="" itemtype="http://schema.org/Answer" data-aid="71319290" data-atoken="226868219" data-collapsed="0" data-created="1504795954" data-deleted="0" data-isowner="0" data-helpful="1" data-copyable="1" data-zop="">
+<link itemprop="url" href="/question/64028409/answer/226868219">
+<meta itemprop="answer-id" content="71319290">
+<meta itemprop="answer-url-token" content="226868219">
+<a class="zg-anchor-hidden" name="answer-71319290"></a>
+
+<div class="zm-item-vote">
+<a class="zm-item-vote-count js-expand js-vote-count" href="javascript:;" data-bind-votecount="">6519</a>
+</div>
+
+<div class="zm-votebar" data-za-module="VoteBar">
+<button class="up" aria-pressed="false" title="赞同">
+<i class="icon vote-arrow"></i>
+<span class="count">6519</span>
+<span class="label sr-only">赞同</span>
+</button>
+<button class="down" aria-pressed="false" title="反对，不会显示你的姓名">
+<i class="icon vote-arrow"></i>
+<span class="label sr-only">反对，不会显示你的姓名</span>
+</button>
+</div>
+
+
+<div class="answer-head">
+
+<div class="zm-item-answer-author-info">
+
+<span class="summary-wrapper">
+
+<span class="author-link-line">
+<a class="author-link" data-hovercard="p$t$shannon_du" target="_blank" href="/people/shannon_du">
+{{ post.author.username }}
+</a>
+</span>
+
+<span title="大公司里的小工程师" class="bio">
+{{ post.author.about_me }}
+</span>
+</span>
+</div>
+
+<div class="zm-item-vote-info" data-votecount="6519" data-za-module="VoteInfo">
+
+
+
+<span class="voters text"><a href="#" class="more text"><span class="js-voteCount">6519</span>&nbsp;人赞同</a></span>
+
+
+</div>
+</div>
+<div class="zm-item-rich-text expandable js-collapse-body" data-resourceid="17837366" data-action="/answer/content" data-author-name="Shannon" data-entry-url="/question/64028409/answer/226868219">
+
+<textarea hidden="" class="content">&lt;p&gt;很早很早以前，看过读者上的一篇鸡汤：“牙膏厂面试新员工的时候问，如何能提高牙膏的效率？有一个人的回答让厂长眼前一亮，当即录用，他的回答是，把牙膏口的直径增加两毫米，这样用户每次就会多挤出来一部分牙膏，牙膏用更短的时间就用完了，销量也随之增加。”&lt;/p&gt;&lt;p&gt;我当时看到这个文章的时候，心里嘀咕着：这不是欺诈吗？&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;当年大四的时候，隔壁寝室的同学从华为面试回来，那次是群面（就是六七个人一组，面试官给一个话题，大家头脑风暴，最后留下在讨论中表现好的人），面试官给的话题是：如何把一个纸杯子卖出更好的价钱。大家为了表现思辨能力，踊跃发言，其中的观点包括：&lt;/p&gt;&lt;p&gt;        1. 卖到没有纸杯的地区，就像南方非常普通的荔枝，一骑红尘到了北方的杨贵妃那里，就变得很值钱了，所以把纸杯卖到从来没有人见过纸杯的地区，一定会买个好价钱。&lt;/p&gt;&lt;p&gt;        2. 在几乎所有具有普通消费水平的地区，纸杯都是非常普通的日用品，第一种方法极难找到市场，所以要想卖好价钱，就要给纸杯足够的附加值，比如推出某某纪念款纸杯，比如在杯子上印上精美的图案，比如做出其他有趣形状的纸杯等等。&lt;/p&gt;&lt;p&gt;        3. 设计一些亲子活动，让小孩在杯子上作画，之后杯子需要付钱才能带走。&lt;/p&gt;&lt;p&gt;        4. 打科技牌，比如号称此杯子具有某某高科技涂层，即使100度开水，也能保证无任何有害物质进入水中，相比同类产品，具有明显优势。&lt;/p&gt;&lt;p&gt;       等等等等。&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;最后，我同学的回答获得了面试官的赞扬，并且顺利进入华为工作，他的回答是：&lt;/p&gt;&lt;p&gt;销售的职责无非就两种：把精华产品卖出更高的价格，把普通产品卖出更多的销量。杯子是普通产品，我们只能依照它原本的价值去卖，但是要保证质量，注重用户口碑，以求卖出更高的销量。任何想把普通产品卖出更高价格的行为，都是南辕北辙。&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;我想题主这个把普通矿泉水卖到300块的问题，和我同学当年遇到的问题是类似的。我认同我同学的回答。&lt;/p&gt;</textarea>
+
+
+<div class="zh-summary summary clearfix">
+
+{% if post.body_html %}
+    {{ post.body_html | safe }}
+{% else %}
+    {{ post.body }}
+{% endif %}
+
+<a href="{{ url_for('.post', id=post.id) }}" class="toggle-expand">显示全部</a>
+
+</div>
+
+
+
+<p class="visible-expanded"><a itemprop="url" class="answer-date-link meta-item" data-tooltip="s$t$发布于 2017-09-07" target="_blank" href="/question/64028409/answer/226868219">编辑于 2017-09-07</a></p>
+
+</div>
+<div class="zm-item-meta answer-actions clearfix js-contentActions">
+<div class="zm-meta-panel">
+
+<a data-follow="q:link" class="follow-link zg-follow meta-item" href="javascript:;" id="sfb-17837366"><i class="z-icon-follow"></i>关注问题</a>
+
+<a href="{{ url_for('.post', id=post.id) }}" name="addcomment" class="meta-item toggle-comment js-toggleCommentBox">
+<i class="z-icon-comment"></i>{{ post.comments.count() }} 条评论</a>
+
+
+<a href="#" class="meta-item zu-autohide js-thank" data-thanked="false"><i class="z-icon-thank"></i>感谢</a>
+
+
+
+<a href="#" class="meta-item zu-autohide js-share goog-inline-block goog-menu-button" role="button" aria-expanded="false" tabindex="0" aria-haspopup="true" style="user-select: none;"><div class="goog-inline-block goog-menu-button-outer-box"><div class="goog-inline-block goog-menu-button-inner-box"><div class="goog-inline-block goog-menu-button-caption"><i class="z-icon-share"></i>分享</div><div class="goog-inline-block goog-menu-button-dropdown">&nbsp;</div></div></div></a>
+
+<a href="#" class="meta-item zu-autohide js-collect"><i class="z-icon-collect"></i>收藏</a>
+
+
+
+
+
+<span class="zg-bull zu-autohide">•</span>
+
+<a href="#" class="meta-item zu-autohide js-noHelp">没有帮助</a>
+
+<span class="zg-bull zu-autohide">•</span>
+<a href="#" class="meta-item zu-autohide js-report">举报</a>
+
+
+
+
+<meta name="copyrightStatus" content="1">
+<meta name="disableCopyAvatar" content="">
+
+<span class="zg-bull">•</span>
+
+<a href="/terms#sec-licence-1" target="_blank" class="meta-item copyright">
+{{ moment(post.timestamp).fromNow() }}
+</a>
+
+
+<button class="meta-item item-collapse js-collapse">
+<i class="z-icon-fold"></i>收起
+</button>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index') }}
+</div>
+{% endif %}
+</div>

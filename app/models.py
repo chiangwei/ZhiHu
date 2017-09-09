@@ -69,7 +69,7 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     email = db.Column(db.String(64), unique=True, index=True)
-    username = db.Column(db.String(64), unique=True, index=True)
+    username = db.Column(db.String(64), index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     password_hash = db.Column(db.String(128))
@@ -265,7 +265,7 @@ class User(UserMixin, db.Model):
                      username=forgery_py.internet.user_name(True),
                      password=forgery_py.lorem_ipsum.word(),
                      confirmed=True,
-                     name=forgery_py.name.full_name(),
+                     name=forgery_py.name.full_name,
                      location=forgery_py.address.city(),
                      about_me=forgery_py.lorem_ipsum.sentence(),
                      member_since=forgery_py.date.date(True))
@@ -297,12 +297,11 @@ def load_user(user_id):
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer,primary_key=True)
+    title = db.Column(db.String)
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
     body_html = db.Column(db.Text)
-
     comments = db.relationship('Comment', backref = 'post', lazy='dynamic')
 
     def to_json(self):
@@ -346,7 +345,7 @@ class Post(db.Model):
         user_count = User.query.count()
         for i in range(count):
             u = User.query.offset(randint(0, user_count - 1)).first()
-            p = Post(body=forgery_py.lorem_ipsum.sentence(randint(1,5)),timestamp=forgery_py.date.date(True),author=u)
+            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1,5)),title=forgery_py.lorem_ipsum.sentences(randint(1,5)),timestamp=forgery_py.date.date(True),author=u)
             db.session.add(p)
             db.session.commit()
 

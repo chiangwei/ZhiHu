@@ -58,7 +58,6 @@ def register():
             username=form.username.data,
             password=form.password.data
         )
-        print(user)
         db.session.add(user)
         #注意，即便通过配置，程序已经可以在请求末尾自动提交数据库变化，这里也要添加db.session.commit() 调用。问题在于，提交数据库之后才能赋予新用户 id 值，而确认令牌需要用到 id ，所以不能延后提交。
         db.session.commit()

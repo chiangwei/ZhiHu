@@ -15,7 +15,7 @@ class LoginForm(FlaskForm):
 
 class RegisteationForm(FlaskForm):
     email = StringField('邮箱', validators=[DataRequired(),Length(1,64),Email()],render_kw={'aria-label':u'邮箱', 'placeholder': u'邮箱'})
-    username = StringField('用户名',validators=[DataRequired(),Length(1.64)],render_kw={'aria-label':u'昵称', 'placeholder': u'昵称'})
+    username = StringField('用户名',validators=[DataRequired(),Length(1.64)],render_kw={'aria-label':u'用户名', 'placeholder': u'昵称'})
     #安全起见，密码要输入两次。此时要验证两个密码字段中的值是否一致，这种验证可使用WTForms 提供的另一验证函数实现，即 EqualTo 。这个验证函数要附属到两个密码字段中的一个上，另一个字段则作为参数传入
     password = PasswordField('密码',validators=[DataRequired(),EqualTo('password2', message=u'两次输入的密码必须一致')],render_kw={'aria-label':u'密码', 'placeholder': u'密码','type':'password','autocomplete':'off'})
     password2 = PasswordField('确认密码',validators=[DataRequired()],render_kw={'aria-label':u'确认密码', 'placeholder': u'确认密码','type':'password','autocomplete':'off'})

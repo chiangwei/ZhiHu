@@ -1,13 +1,21 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,BooleanField,SubmitField,TextAreaField,SelectField
-from wtforms.validators import Required,Length,Email,EqualTo
+from wtforms import StringField,PasswordField,BooleanField,SubmitField,TextAreaField,SelectField,FileField
+from wtforms.validators import DataRequired,Length,Email,EqualTo
 from wtforms import ValidationError
 from ..models import User, Role
 from flask_pagedown.fields import PageDownField
 
+#提问题表单
+class AskQuestionForm(FlaskForm):
+    title = StringField('问题标题',validators=[DataRequired()])
+    body = PageDownField('问题描述（可选）：')
+    img = FileField('图片')
+    #将C:\zhihu\venv\Lib\site-packages\flask_bootstrap\templates\bootstrap\wtf.html第56行改为{{field}},不再让他使用默认得按钮样式
+    submit = SubmitField('提问',render_kw={'class':'btn btn-primary'})
+
 #文章内容表单
 class PostForm(FlaskForm):
-    body = PageDownField('提出你感兴趣的问题',validators=[Required()])
+    body = PageDownField('提出你感兴趣的问题',validators=[DataRequired()])
     submit = SubmitField('提问')
 
 #个人信息编辑表单
@@ -20,9 +28,9 @@ class EditProfileForm(FlaskForm):
 #WTForms 对 HTML 表单控件 <select> 进行 SelectField 包装，从而实现下拉列表，用来在这个表单中选择用户角色。 SelectField 实例必须在其 choices 属性中设置各选项。选项必须是一个由元组组成的列表，各元组都包含两个元素：选项的标识符和显示在控件中的文本字符串。 choices 列表在表单的构造函数中设定，其值从 Role 模型中获取，使用一个查询按照角色名的字母顺序排列所有角色。元组中的标识符是角色的 id ，因为这是个整数，所以在 SelectField 构造函数中添加 coerce=int 参数，从而把字段的值转换为整数，而不使用默认的字符串。
 #管理员级#个人信息编辑表单
 class EditProfileAdminForm(FlaskForm):
-    email = StringField('Email', validators=[Required(), Length(1, 64),
+    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
                                              Email()])
-    username = StringField('Username', validators=[Required(), Length(1, 64)])
+    username = StringField('Username', validators=[DataRequired(), Length(1, 64)])
     confirmed = BooleanField('Confirmed')
     role = SelectField('Role', coerce=int)
     name = StringField('Real name', validators=[Length(0, 64)])
@@ -48,5 +56,5 @@ class EditProfileAdminForm(FlaskForm):
 
 #评论输入表单
 class CommentForm(FlaskForm):
-    body = StringField('说你所想', validators=[Required()])
+    body = StringField('说你所想', validators=[DataRequired()])
     submit = SubmitField('评论')
