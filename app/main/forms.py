@@ -54,6 +54,11 @@ class EditProfileAdminForm(FlaskForm):
                 User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')
 
+# 回答输入表单
+class AnswerForm(FlaskForm):
+    body = PageDownField(validators=[DataRequired()])
+    submit = SubmitField('提交回答')
+
 #评论输入表单
 class CommentForm(FlaskForm):
     body = StringField('说你所想', validators=[DataRequired()])

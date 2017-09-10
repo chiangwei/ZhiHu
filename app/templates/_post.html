@@ -17,7 +17,7 @@
 <div class="zm-votebar" data-za-module="VoteBar">
 <button class="up" aria-pressed="false" title="赞同">
 <i class="icon vote-arrow"></i>
-<span class="count">6519</span>
+
 <span class="label sr-only">赞同</span>
 </button>
 <button class="down" aria-pressed="false" title="反对，不会显示你的姓名">
@@ -68,8 +68,6 @@
 {% else %}
     {{ post.body }}
 {% endif %}
-
-<a href="{{ url_for('.post', id=post.id) }}" class="toggle-expand">显示全部</a>
 
 </div>
 
@@ -128,9 +126,4 @@
 </div>
 {% endfor %}
 </div>
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.index') }}
-</div>
-{% endif %}
 </div>

@@ -1,7 +1,7 @@
 from flask import render_template, redirect, request, url_for, flash, abort,current_app,make_response
 from flask_login import login_user,logout_user,login_required,current_user
-from ..models import User,Permission,Post,Role,Comment
-from .forms import PostForm, EditProfileForm, EditProfileAdminForm,CommentForm,AskQuestionForm
+from ..models import User,Permission,Post,Role,Comment,Answer
+from .forms import PostForm, EditProfileForm, EditProfileAdminForm,CommentForm,AskQuestionForm,AnswerForm
 from .. import db
 from . import main
 from ..decorators import admin_required, permission_required
@@ -88,9 +88,9 @@ def askquestion():
 
     return render_template('askquestion.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
-@main.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
+@main.route('/user/<id>')
+def user(id):
+    user = User.query.filter_by(id=id).first_or_404()
     page = request.args.get('page',1,type=int)
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],error_out=False)
     posts = pagination.items
@@ -157,41 +157,63 @@ def edit(id):
     return render_template('edit_post.html', form=form)
 
 
-#评论
+#回答问题
 @main.route('/post/<int:id>',methods=['GET','POST'])
 def post(id):
     post = Post.query.get_or_404(id)
-    form = CommentForm()
+    form = AnswerForm()
     if form.validate_on_submit():
-        comment = Comment(body=form.body.data,
+        answer = Answer(body=form.body.data,
                           post=post,
                           author=current_user._get_current_object()
                           )
-        db.session.add(comment)
-        flash('评论成功')
+        db.session.add(answer)
+        flash('提交答案成功')
         return redirect(url_for('.post', id=post.id, page=-1))
     page = request.args.get('page', 1, type=int)
     if page == -1:
-        page = (post.comments.count()-1)// \
-               current_app.config['FLASKY_COMMENTS_PER_PAGE'] + 1
-    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
-            page,per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False
+        page = (post.answers.count()-1)// \
+               current_app.config['FLASKY_ANSWERS_PER_PAGE'] + 1
+    pagination = post.answers.order_by(Answer.timestamp.asc()).paginate(
+            page,per_page=current_app.config['FLASKY_ANSWERS_PER_PAGE'],error_out=False
+        )
+    answers = pagination.items
+
+    return render_template('post.html', posts=[post], form=form, answers=answers,pagination=pagination)
+
+#对答案进行评价
+@main.route('/comment/<int:id>',methods=['GET','POST'])
+def comment(id):
+    answer = Answer.query.get_or_404(id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(body=form.body.data,answer=answer,author=current_user._get_current_object()
+                          )
+        db.session.add(comment)
+        flash('评论成功')
+        return redirect(url_for('main.comment', id=answer.id, page=-1))
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (answer.comments.count()-1)// \
+               current_app.config['FLASKY_ANSWERS_PER_PAGE'] + 1
+    pagination = answer.comments.order_by(Comment.timestamp.asc()).paginate(
+            page,per_page=current_app.config['FLASKY_ANSWERS_PER_PAGE'],error_out=False
         )
     comments = pagination.items
 
-    return render_template('post.html', posts=[post], form=form, comments=comments,pagination=pagination)
+    return render_template('comment.html', answers=[answer], form=form, comments=comments,pagination=pagination)
 
 @main.route('/moderate')
 @login_required
-@permission_required(Permission.MODERATE_COMMENTS)
+@permission_required(Permission.MODERATE_ANSWERS)
 def moderate():
     page = request.args.get('page',1,type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+    pagination = Answer.query.order_by(Answer.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_ANSWERS_PER_PAGE'],
         error_out=False
     )
-    comments = pagination.items
-    return render_template('moderate.dll', comments=comments,pagination=pagination,page=page)
+    answers = pagination.items
+    return render_template('moderate.dll', answers=answers,pagination=pagination,page=page)
 
 
 #“关注”路由和视图函数
@@ -261,7 +283,7 @@ def show_followed():
 
 @main.route('/moderate/enable/<int:id>')
 @login_required
-@permission_required(Permission.MODERATE_COMMENTS)
+@permission_required(Permission.MODERATE_ANSWERS)
 def moderate_enable(id):
     comment = Comment.query.get_or_404(id)
     comment.disabled = False
@@ -272,7 +294,7 @@ def moderate_enable(id):
 
 @main.route('/moderate/disable/<int:id>')
 @login_required
-@permission_required(Permission.MODERATE_COMMENTS)
+@permission_required(Permission.MODERATE_ANSWERS)
 def moderate_disable(id):
     comment = Comment.query.get_or_404(id)
     comment.disabled = True

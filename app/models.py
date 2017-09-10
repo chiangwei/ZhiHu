@@ -15,7 +15,7 @@ class Permission:
     FOLLOW = 0x01
     COMMENT = 0x02
     WRITE_ARTICLES = 0x04
-    MODERATE_COMMENTS = 0x08
+    MODERATE_ANSWERS = 0x08
     ADMINISTER = 0x80
 
 #角色
@@ -39,7 +39,7 @@ class Role(db.Model):
             'Moderator': (Permission.FOLLOW |
                           Permission.COMMENT |
                           Permission.WRITE_ARTICLES |
-                          Permission.MODERATE_COMMENTS, False),
+                          Permission.MODERATE_ANSWERS, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -96,6 +96,7 @@ class User(UserMixin, db.Model):
                                 lazy='dynamic',
                                 cascade='all, delete-orphan' )
 
+    answers = db.relationship('Answer', backref='author', lazy='dynamic')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     avatar_hash = db.Column(db.String(32))
 
@@ -265,7 +266,7 @@ class User(UserMixin, db.Model):
                      username=forgery_py.internet.user_name(True),
                      password=forgery_py.lorem_ipsum.word(),
                      confirmed=True,
-                     name=forgery_py.name.full_name,
+                     name=forgery_py.name.full_name(),
                      location=forgery_py.address.city(),
                      about_me=forgery_py.lorem_ipsum.sentence(),
                      member_since=forgery_py.date.date(True))
@@ -302,7 +303,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     body_html = db.Column(db.Text)
-    comments = db.relationship('Comment', backref = 'post', lazy='dynamic')
+    answers = db.relationship('Answer', backref = 'post', lazy='dynamic')
 
     def to_json(self):
         json_post = {
@@ -312,9 +313,9 @@ class Post(db.Model):
             'timestamp': self.timestamp,
             'author': url_for('api.get_user', id=self.author_id,
                               _external=True),
-            'comments': url_for('api.get_post_comments', id=self.id,
+            'answers': url_for('api.get_post_answers', id=self.id,
                                 _external=True),
-            'comment_count': self.comments.count()
+            'comment_count': self.answers.count()
         }
         return json_post
 
@@ -353,8 +354,8 @@ class Post(db.Model):
 db.event.listen(Post.body, 'set', Post.on_change_body)
 
 
-class Comment(db.Model):
-    __tablename__ = 'comments'
+class Answer(db.Model):
+    __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key = True)
     body = db.Column(db.Text)
     body.html = db.Column(db.Text)
@@ -362,6 +363,7 @@ class Comment(db.Model):
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    comments = db.relationship('Comment', backref='answer', lazy='dynamic')
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -371,4 +373,14 @@ class Comment(db.Model):
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
 
-db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+db.event.listen(Answer.body, 'set', Answer.on_changed_body)
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key = True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    answer_id = db.Column(db.Integer, db.ForeignKey('answers.id'))
