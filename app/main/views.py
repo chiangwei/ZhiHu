@@ -217,20 +217,36 @@ def moderate():
 
 
 #“关注”路由和视图函数
-@main.route('/follow/<username>')
+@main.route('/follow/<id>')
 @login_required
 @permission_required(Permission.FOLLOW)
-def follow(username):
-    user = User.query.filter_by(username=username).first()
+def follow(id):
+    user = User.query.filter_by(id=id).first()
     if user is None:
         flash('Invalid user.')
         return redirect(url_for('.index'))
     if current_user.is_following(user):
         flash('You are already following this user.')
-        return redirect(url_for('.user', username=username))
+        return redirect(url_for('.user', id=id))
     current_user.follow(user)
-    flash('You are now following %s.' % username)
-    return redirect(url_for('.user', username=username))
+    flash('You are now following %s.' % id)
+    return redirect(url_for('.user', id=id))
+
+#取消关注
+@main.route('/unfollow/<id>')
+@login_required
+@permission_required(Permission.FOLLOW)
+def unfollow(id):
+    user = User.query.filter_by(id=id).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    if not current_user.is_following(user):
+        flash('You are not following this user.')
+        return redirect(url_for('.user', id=id))
+    current_user.unfollow(user)
+    flash('You are not following %s anymore.' % id)
+    return redirect(url_for('.user', id=id))
 
 #“关注者”路由和视图函数
 @main.route('/followers/<username>')

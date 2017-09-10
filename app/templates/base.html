@@ -206,7 +206,46 @@ style="visibility:hidden" data-count="0">
     </div>
     {% endfor %}
 
-    {% block page_content %}{% endblock %}
+
+
+<!--知乎正文部分-->
+<div class="zg-wrap zu-main clearfix " role="main">
+<div class="zu-main-content">
+<div class="zu-main-content-inner">
+
+<!--&lt;!&ndash;正文部分start&ndash;&gt;-->
+
+<!--{% include 'zh-recommend.html' %}-->
+
+<!--&lt;!&ndash;正文部分end&ndash;&gt;-->
+
+
+<div class="explore-tab" id="js-explore-tab">
+<!--<a class="zg-anchor-hidden" name="daily-hot"></a>-->
+<!--<a class="zg-anchor-hidden" name="monthly-hot"></a>-->
+<!--<ul class="tab-navs clearfix">-->
+<!--<li class="tab-nav active"><a class="anchor" href="#daily-hot" data-za-c="explore" data-za-a="visit_explore_daily_trendings" data-za-l="explore_daily_trendings">今日最热</a></li>-->
+<!--<li class="tab-nav"><a class="anchor" href="#monthly-hot" data-za-c="explore" data-za-a="visit_explore_monthly_trendings" data-za-l="explore_monthly_trendings">本月最热</a></li>-->
+<!--</ul>-->
+<div class="tab-panel" style="display: block;">
+<!--知乎正文部分-->
+
+{% block page_content %}{% endblock %}
+
+<div class="tab-panel" style="display: none;">
+<div data-type="monthly" data-zop-feedlist="">
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+{% block right_content %}{% endblock %}
+
+</div>
+
 </div>
 {% endblock %}
 </body>

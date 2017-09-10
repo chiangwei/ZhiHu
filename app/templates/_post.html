@@ -115,7 +115,11 @@
 <a href="/terms#sec-licence-1" target="_blank" class="meta-item copyright">
 {{ moment(post.timestamp).fromNow() }}
 </a>
-
+{% if post.author.id == current_user.id %}
+<a href="{{ url_for('.edit',id=post.id) }}" target="_blank" class="meta-item copyright">
+修改问题
+</a>
+{% endif %}
 
 <button class="meta-item item-collapse js-collapse">
 <i class="z-icon-fold"></i>收起
