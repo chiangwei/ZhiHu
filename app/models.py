@@ -140,14 +140,19 @@ class User(UserMixin, db.Model):
 
     #点赞的方法
     def agree(self, answer):
+        print(answer.agreements_num)
         # if not self.is_agreeing(answer):
-            f = Agreement(user_id = self.id, answer_id = answer.id)
-            db.session.add(f)
+        f = Agreement(user_id = self.id, answer_id = answer.id)
+        answer.agreements_num = answer.agreements_num + 1
+        db.session.add(f)
+        db.session.add(answer)
 
     def unagree(self, answer):
-        f = self.user.filter_by(answer_id = answer.id).first()
-        if f:
-            db.session.delete(f)
+        f = Agreement.query.filter_by(user_id = self.id).filter_by(answer_id = answer.id).first()
+        answer.agreements_num = answer.agreements_num - 1
+        db.session.delete(f)
+        db.session.add(answer)
+
 
     def is_agreeing(self, answer):
         return Agreement.query.filter_by(user_id = self.id).filter_by(answer_id = answer.id).first() is not None
@@ -404,6 +409,7 @@ class Answer(db.Model):
     comments = db.relationship('Comment', backref='answer', lazy='dynamic')
 
     answer = db.relationship('Agreement', backref='answer', lazy='dynamic')
+    agreements_num = db.Column(db.Integer,default = 0)
 
     # answer = db.relationship('Agreement',
     #                        foreign_keys=[Agreement.answer_id],

@@ -32,9 +32,9 @@
             {% endif %}
 
             {% if not current_user.is_agreeing(answer) %}
-                <a href="{{ url_for('.agree', id=answer.id) }}" class="btn btn-primary">赞同</a>
+                <a href="{{ url_for('.agree', id=answer.id) }}" class="btn btn-primary">已有{{ answer.agreements_num }}赞同</a>
             {% else %}
-                <a href="{{ url_for('.unagree', id=answer.id) }}" class="btn btn-default">取消</a>
+                <a href="{{ url_for('.unagree', id=answer.id) }}" class="btn btn-default">已有{{ answer.agreements_num }}赞同</a>
             {% endif %}
 
             <a href="{{ url_for('main.comment', id=answer.id) }}#comments">
