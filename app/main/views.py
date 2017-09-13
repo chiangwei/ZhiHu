@@ -169,6 +169,7 @@ def post(id):
                           )
         db.session.add(answer)
         flash('提交答案成功')
+        #评论按照时间戳顺序排列，新评论显示在列表的底部。提交评论后，请求结果是一个重定向，转回之前的 URL，但是在 url_for() 函数的参数中把 page 设为 -1 ，这是个特殊的页数，用来请求评论的最后一页，所以刚提交的评论才会出现在页面中。程序从查询字符串中获取页数，发现值为 -1 时，会计算评论的总量和总页数，得出真正要显示的页数。
         return redirect(url_for('.post', id=post.id, page=-1))
     page = request.args.get('page', 1, type=int)
     if page == -1:
@@ -213,7 +214,7 @@ def moderate():
         error_out=False
     )
     answers = pagination.items
-    return render_template('moderate.dll', answers=answers,pagination=pagination,page=page)
+    return render_template('moderate.html', answers=answers,pagination=pagination,page=page)
 
 
 #“关注”路由和视图函数
@@ -281,12 +282,43 @@ def followed_by(username):
                            endpoint='.followed_by', pagination=pagination,
                            follows=follows)
 
+#点赞
+@main.route('/agree/<id>')
+def agree(id):
+    answer = Answer.query.filter_by(id=id).first()
+    if answer is None:
+        flash('答案找不到了')
+        return redirect(url_for('.index'))
+    if current_user.is_agreeing(answer):
+        flash('已经点过赞了.')
+        return redirect(url_for('.index'))
+    current_user.agree(answer)
+    flash('点赞成功')
+    return redirect(url_for('.index'))
 
+#取消点赞
+@main.route('/unagree/<id>')
+def unagree(id):
+    answer = Answer.query.filter_by(id=id).first()
+    if answer is None:
+        flash('答案找不到了')
+        return redirect(url_for('.index'))
+    if not current_user.is_agreeing(answer):
+        flash('还没点过赞呢.')
+        return redirect(url_for('.index', id=id))
+    current_user.unagree(answer)
+    flash('取消成功!')
+    return redirect(url_for('.index', id=id))
+
+
+
+
+#指向这两个路由的链接添加在首页模板中。点击这两个链接后会为 show_followed cookie 设定适当的值，然后重定向到首页。cookie 只能在响应对象中设置，因此这两个路由不能依赖 Flask，要使用 make_response()方法创建响应对象。
 @main.route('/all')
 @login_required
 def show_all():
     resp = make_response(redirect(url_for('.index')))
-    resp.set_cookie('show_followed', '', max_age=30*24*60*60)
+    resp.set_cookie('show_followed', '')
     return resp
 
 
@@ -294,16 +326,16 @@ def show_all():
 @login_required
 def show_followed():
     resp = make_response(redirect(url_for('.index')))
-    resp.set_cookie('show_followed', '1', max_age=30*24*60*60)
+    resp.set_cookie('show_followed', '1')
     return resp
 
 @main.route('/moderate/enable/<int:id>')
 @login_required
 @permission_required(Permission.MODERATE_ANSWERS)
 def moderate_enable(id):
-    comment = Comment.query.get_or_404(id)
-    comment.disabled = False
-    db.session.add(comment)
+    answer = Answer.query.get_or_404(id)
+    answer.disabled = False
+    db.session.add(answer)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
 
@@ -312,8 +344,8 @@ def moderate_enable(id):
 @login_required
 @permission_required(Permission.MODERATE_ANSWERS)
 def moderate_disable(id):
-    comment = Comment.query.get_or_404(id)
-    comment.disabled = True
-    db.session.add(comment)
+    answer = Answer.query.get_or_404(id)
+    answer.disabled = True
+    db.session.add(answer)
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))

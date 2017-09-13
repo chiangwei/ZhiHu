@@ -54,6 +54,7 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+#关注人的关系表
 class Follow(db.Model):
     __tablename__ = 'flowes'
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
@@ -61,6 +62,14 @@ class Follow(db.Model):
     followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                             primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+#赞同关系表,回答ID,用户ID
+class Agreement(db.Model):
+    __tablename__ = 'agreements'
+    answer_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('answers.id'),
+                            primary_key=True)
 
 #Flask-Login 提供了一个 UserMixin 类其中包含这些is_authenticated()is_active() is_anonymous()get_id()方法的默认实现,咱们的用户类继承了它,就不用从模型中自己重新实现这些验证方法啦
 #用户
@@ -100,8 +109,17 @@ class User(UserMixin, db.Model):
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     avatar_hash = db.Column(db.String(32))
 
+    user = db.relationship('Agreement', backref='user', lazy='dynamic')
+
+    # user = db.relationship('Agreement',
+    #                        foreign_keys=[Agreement.user_id],
+    #                        backref=db.backref('Agreement',backref='answer', lazy='joined'),
+    #                        lazy='dynamic',
+    #                        cascade='all, delete-orphan'
+    #                        )
 
 
+    #关注的方法,视图函数中调用的
     def follow(self, user):
         if not self.is_following(user):
             f = Follow(follower=self, followed=user)
@@ -120,23 +138,43 @@ class User(UserMixin, db.Model):
         return self.followers.filter_by(
             follower_id=user.id).first() is not None
 
+    #点赞的方法
+    def agree(self, answer):
+        # if not self.is_agreeing(answer):
+            f = Agreement(user_id = self.id, answer_id = answer.id)
+            db.session.add(f)
+
+    def unagree(self, answer):
+        f = self.user.filter_by(answer_id = answer.id).first()
+        if f:
+            db.session.delete(f)
+
+    def is_agreeing(self, answer):
+        return Agreement.query.filter_by(user_id = self.id).filter_by(answer_id = answer.id).first() is not None
+
+
+
+    #followed_posts() 方法定义为属性，因此调用时无需加 ()
     @property
     def followed_posts(self):
         return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
             .filter(Follow.follower_id == self.id)
 
+    #注意，为了保护隐私，这个方法中用户的某些属性没有加入响应，例如 email 和 role 。这段代码再次说明，提供给客户端的资源表示没必要和数据库模型的内部表示完全一致。
+    #把用户转换成 JSON 格式的序列化字典
     def to_json(self):
-        json_user = {
-            'url': url_for('api.get_user', id=self.id, _external=True),
-            'username': self.username,
-            'member_since': self.member_since,
-            'last_seen': self.last_seen,
-            'posts': url_for('api.get_user_posts', id=self.id, _external=True),
-            'followed_posts': url_for('api.get_user_followed_posts',
-                                      id=self.id, _external=True),
-            'post_count': self.posts.count()
+        json_post = {
+            'url': url_for('api.get_post', id=self.id, _external=True),
+            'body': self.body,
+            'body_html': self.body_html,
+            'timestamp': self.timestamp,
+            'author': url_for('api.get_user', id=self.author_id,
+                              _external=True),
+            'comments': url_for('api.get_post_comments', id=self.id,
+                                _external=True),
+            'comment_count': self.comments.count()
         }
-        return json_user
+        return json_post
 
     def ping(self):
         self.last_seen = datetime.utcnow()
@@ -305,16 +343,16 @@ class Post(db.Model):
     body_html = db.Column(db.Text)
     answers = db.relationship('Answer', backref = 'post', lazy='dynamic')
 
+    #把文章转换成 JSON 格式的序列化字典
+    #url 、 author 和 comments 字段要分别返回各自资源的 URL，因此它们使用 url_for() 生成，所调用的路由即将在 API 蓝本中定义。注意，所有 url_for() 方法都指定了参数 _external=True ，这么做是为了生成完整的 URL，而不是生成传统 Web 程序中经常使用的相对 URL。这段代码还说明表示资源时可以使用虚构的属性。 comment_count 字段是博客文章的评论数量，并不是模型的真实属性，它之所以包含在这个资源中是为了便于客户端使用。
     def to_json(self):
         json_post = {
             'url': url_for('api.get_post', id=self.id, _external=True),
             'body': self.body,
             'body_html': self.body_html,
             'timestamp': self.timestamp,
-            'author': url_for('api.get_user', id=self.author_id,
-                              _external=True),
-            'answers': url_for('api.get_post_answers', id=self.id,
-                                _external=True),
+            'author': url_for('api.get_user', id=self.author_id, _external=True),
+            'answers': url_for('api.get_post_answers', id=self.id, _external=True),
             'comment_count': self.answers.count()
         }
         return json_post
@@ -364,6 +402,15 @@ class Answer(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     comments = db.relationship('Comment', backref='answer', lazy='dynamic')
+
+    answer = db.relationship('Agreement', backref='answer', lazy='dynamic')
+
+    # answer = db.relationship('Agreement',
+    #                        foreign_keys=[Agreement.answer_id],
+    #                        backref=db.backref('Agreement',backref='user', lazy='joined'),
+    #                        lazy='dynamic',
+    #                        cascade='all, delete-orphan'
+    #                        )
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):

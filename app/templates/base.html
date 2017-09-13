@@ -80,6 +80,17 @@ style="visibility:hidden" data-count="0">
 
 
 
+
+
+{% if current_user.can(Permission.MODERATE_ANSWERS) %}
+<a href="{{ url_for('main.moderate') }}" class="zu-top-nav-userinfo" id="" data-toggle="">
+<button class="zu-top-add-question" id="zu-top-add-question">
+管理
+</button>
+</a>
+{% endif %}
+
+
 <a href="{{ url_for('main.askquestion') }}" class="zu-top-nav-userinfo" id="" data-toggle="">
 <button class="zu-top-add-question" id="zu-top-add-question">
 提问
@@ -221,12 +232,23 @@ style="visibility:hidden" data-count="0">
 
 
 <div class="explore-tab" id="js-explore-tab">
-<!--<a class="zg-anchor-hidden" name="daily-hot"></a>-->
-<!--<a class="zg-anchor-hidden" name="monthly-hot"></a>-->
-<!--<ul class="tab-navs clearfix">-->
-<!--<li class="tab-nav active"><a class="anchor" href="#daily-hot" data-za-c="explore" data-za-a="visit_explore_daily_trendings" data-za-l="explore_daily_trendings">今日最热</a></li>-->
-<!--<li class="tab-nav"><a class="anchor" href="#monthly-hot" data-za-c="explore" data-za-a="visit_explore_monthly_trendings" data-za-l="explore_monthly_trendings">本月最热</a></li>-->
-<!--</ul>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="tab-panel" style="display: block;">
 <!--知乎正文部分-->
 

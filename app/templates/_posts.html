@@ -83,7 +83,14 @@
 
 <a data-follow="q:link" class="follow-link zg-follow meta-item" href="javascript:;" id="sfb-17837366"><i class="z-icon-follow"></i>关注问题</a>
 
-<a href="{{ url_for('.post', id=post.id) }}" name="addcomment" class="meta-item toggle-comment js-toggleCommentBox">
+
+<!--这个链接的地址是在文章的固定链接后面加上一个-->
+<!--#comments 后缀。这个后缀称为 URL 片段，用于指定加载页面后滚动条所在的初始位置。-->
+<!--Web 浏览器会寻找 id 等于 URL 片段的元素并滚动页面，让这个元素显示在窗口顶部。这-->
+<!--个初始位置被设为 post.html 模板中评论区的标题，即 <h4 id="comments">Comments<h4> -->
+<a href="{{ url_for('.post', id=post.id) }}#comments" name="addcomment" class="meta-item toggle-comment js-toggleCommentBox">
+
+<!--注意链接文本中显示评论数量的方法。评论数量可以使用 SQLAlchemy 提供的 count() 过滤器轻易地从 posts 和 comments 表的一对多关系中获取-->
 <i class="z-icon-comment"></i>{{ post.answers.count() }} 条评论</a>
 
 

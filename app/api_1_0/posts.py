@@ -5,7 +5,7 @@ from . import api
 from .decorators import permission_required
 from .errors import forbidden
 
-
+#文章资源 GET 请求的处理程序, 文章资源 GET 请求的处理程序
 @api.route('/posts/')
 def get_posts():
     page = request.args.get('page', 1, type=int)
@@ -32,7 +32,7 @@ def get_post(id):
     post = Post.query.get_or_404(id)
     return jsonify(post.to_json())
 
-
+#文章资源 POST 请求的处理程序
 @api.route('/posts/', methods=['POST'])
 @permission_required(Permission.WRITE_ARTICLES)
 def new_post():
