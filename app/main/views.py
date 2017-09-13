@@ -175,7 +175,7 @@ def post(id):
     if page == -1:
         page = (post.answers.count()-1)// \
                current_app.config['FLASKY_ANSWERS_PER_PAGE'] + 1
-    pagination = post.answers.order_by(Answer.timestamp.asc()).paginate(
+    pagination = post.answers.order_by(Answer.agreements_num.desc()).paginate(
             page,per_page=current_app.config['FLASKY_ANSWERS_PER_PAGE'],error_out=False
         )
     answers = pagination.items
