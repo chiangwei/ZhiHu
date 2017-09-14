@@ -9,6 +9,7 @@ from markdown import markdown
 import bleach,hashlib
 from app.exceptions import ValidationError
 
+
 #权限常量
 class Permission:
     #用十六进制来表示
@@ -340,13 +341,15 @@ def load_user(user_id):
 #文章内容模型
 class Post(db.Model):
     __tablename__ = 'posts'
+    __searchable__ = ['body']
+
     id = db.Column(db.Integer,primary_key=True)
     title = db.Column(db.String)
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime,index=True,default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     body_html = db.Column(db.Text)
-    answers = db.relationship('Answer', backref = 'post', lazy='dynamic')
+    answers = db.relationship('Answer', backref = 'post', lazy='dynamic', cascade='all, delete-orphan')
 
     #把文章转换成 JSON 格式的序列化字典
     #url 、 author 和 comments 字段要分别返回各自资源的 URL，因此它们使用 url_for() 生成，所调用的路由即将在 API 蓝本中定义。注意，所有 url_for() 方法都指定了参数 _external=True ，这么做是为了生成完整的 URL，而不是生成传统 Web 程序中经常使用的相对 URL。这段代码还说明表示资源时可以使用虚构的属性。 comment_count 字段是博客文章的评论数量，并不是模型的真实属性，它之所以包含在这个资源中是为了便于客户端使用。
@@ -393,7 +396,6 @@ class Post(db.Model):
             db.session.add(p)
             db.session.commit()
 
-
 db.event.listen(Post.body, 'set', Post.on_change_body)
 
 
@@ -406,7 +408,9 @@ class Answer(db.Model):
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-    comments = db.relationship('Comment', backref='answer', lazy='dynamic')
+
+    #cascade 参数配置在父对象上执行的操作对相关对象的影响。比如，层叠选项可设定为：将用户添加到数据库会话后，要自动把所有关系的对象都添加到会话中。层叠选项的默认值能满足大多数情况的需求，但对这个多对多关系来说却不合用。删除对象时，默认的层叠行为是把对象联接的所有相关对象的外键设为空值。但在关联表中，删除记录后正确的行为应该是把指向该记录的实体也删除，因为这样能有效销毁联接。这就是层叠选项值delete-orphan 的作用。
+    comments = db.relationship('Comment', backref='answer', lazy='dynamic', cascade='all, delete-orphan')
 
     answer = db.relationship('Agreement', backref='answer', lazy='dynamic')
     agreements_num = db.Column(db.Integer,default = 0)

@@ -7,6 +7,8 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_pagedown import PageDown
 
+import flask_whooshalchemyplus
+
 #构造文件导入了大多数正在使用的 Flask 扩展。由于尚未初始化所需的程序实例，所以没有初始化扩展，创建扩展类时没有向构造函数传入参数。
 mail = Mail()
 monment = Moment()
@@ -45,6 +47,8 @@ def create_app(config_name):
     mail.init_app(app)
     monment.init_app(app)
     pagedown.init_app(app)
+
+    flask_whooshalchemyplus.init_app(app)
 
     #工厂函数返回创建的程序示例
     return app

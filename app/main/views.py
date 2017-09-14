@@ -45,6 +45,9 @@ def index():
         error_out=False)
     posts = pagination.items
 
+    import flask_whooshalchemyplus
+    flask_whooshalchemyplus.index_one_model(Post)
+
     return render_template('index4.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
 @main.route('/askquestion', methods=['GET','POST'])
@@ -155,6 +158,39 @@ def edit(id):
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
     return render_template('edit_post.html', form=form)
+
+#删除文章的路由
+@main.route('/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def delete(id):
+    post = Post.query.get_or_404(id)
+    if current_user != post.author and \
+        not current_user.can(Permission.ADMINISTER):
+        abort(403)
+    db.session.delete(post)
+    flash('问题已经删除')
+    return redirect(url_for('.index'))
+
+#搜索文章的路由
+@main.route('/search/', methods=['GET', 'POST'])
+@login_required
+def search():
+    #获取搜索表单传过来的数据
+    keyword = request.form.get('q','default value')
+    print(keyword)
+    results = Post.query.whoosh_search(keyword)
+    print('8888888888888888888888888888888888888')
+    for i in results:
+        print(i.body)
+    print('8888888888888888888888888888888888888')
+
+    # if current_user != post.author and \
+    #     not current_user.can(Permission.ADMINISTER):
+    #     abort(403)
+    # db.session.delete(post)
+    # flash('问题已经删除')
+    # return redirect(url_for('.index'))
+
 
 
 #回答问题

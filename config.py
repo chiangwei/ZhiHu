@@ -1,6 +1,7 @@
 #coding:utf-8
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
+WHOOSH_BASE = os.path.join(basedir, 'zhihu-data-dev.sqlite')
 
 #基类 Config 中包含通用配置
 class Config:

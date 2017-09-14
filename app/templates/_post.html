@@ -119,6 +119,9 @@
 <a href="{{ url_for('.edit',id=post.id) }}" target="_blank" class="meta-item copyright">
 修改问题
 </a>
+<a href="{{ url_for('.delete',id=post.id) }}" target="_blank" class="meta-item copyright">
+删除问题
+</a>
 {% endif %}
 
 <button class="meta-item item-collapse js-collapse">
