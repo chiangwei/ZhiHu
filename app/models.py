@@ -8,6 +8,7 @@ from datetime import datetime
 from markdown import markdown
 import bleach,hashlib
 from app.exceptions import ValidationError
+from jieba.analyse.analyzer import ChineseAnalyzer
 
 
 #权限常量
@@ -341,7 +342,8 @@ def load_user(user_id):
 #文章内容模型
 class Post(db.Model):
     __tablename__ = 'posts'
-    __searchable__ = ['body']
+    __searchable__ = ['title']
+    __analyzer__ = ChineseAnalyzer()
 
     id = db.Column(db.Integer,primary_key=True)
     title = db.Column(db.String)

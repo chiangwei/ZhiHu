@@ -89,6 +89,9 @@ def askquestion():
         error_out=False)
     posts = pagination.items
 
+    import flask_whooshalchemyplus
+    flask_whooshalchemyplus.index_one_model(Post)
+
     return render_template('askquestion.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
 @main.route('/user/<id>')
@@ -177,20 +180,17 @@ def delete(id):
 def search():
     #获取搜索表单传过来的数据
     keyword = request.form.get('q','default value')
-    print(keyword)
-    results = Post.query.whoosh_search(keyword)
-    print('8888888888888888888888888888888888888')
-    for i in results:
-        print(i.body)
-    print('8888888888888888888888888888888888888')
 
-    # if current_user != post.author and \
-    #     not current_user.can(Permission.ADMINISTER):
-    #     abort(403)
-    # db.session.delete(post)
-    # flash('问题已经删除')
-    # return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    show_followed = False
 
+    # 为了显示某页中的记录，要把 all() 换成 Flask-SQLAlchemy 提供的 paginate() 方法。页数是 paginate() 方法的第一个参数，也是唯一必需的参数。可选参数 per_page 用来指定每页显示的记录数量；如果没有指定，则默认显示 20 个记录。另一个可选参数为 error_out ，当其设为 True 时（默认值），如果请求的页数超出了范围，则会返回 404 错误；如果设为 False ，页数超出范围时会返回一个空列表。为了能够很便利地配置每页显示的记录数量，参数 per_page 的值从程序的环境变量 FLASKY_POSTS_PER_PAGE 中读取。这样修改之后，首页中的文章列表只会显示有限数量的文章。若想查看第 2 页中的文章，要在浏览器地址栏中的 URL 后加上查询字符串 ?page=2。
+    pagination = Post.query.whoosh_search(keyword).order_by(Post.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    posts = pagination.items
+
+    return render_template('searched.html',posts=posts, show_followed=show_followed, pagination=pagination)
 
 
 #回答问题
