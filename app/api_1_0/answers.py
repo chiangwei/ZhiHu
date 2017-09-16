@@ -37,7 +37,7 @@ def get_post_answers(id):
     post = Post.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
     pagination = post.answers.order_by(Answer.timestamp.asc()).paginate(
-        page, per_page=current_app.config['FLASKY_answers_PER_PAGE'],
+        page, per_page=current_app.config['FLASKY_ANSWERS_PER_PAGE'],
         error_out=False)
     answers = pagination.items
     prev = None
@@ -68,3 +68,13 @@ def new_post_answer(id):
     return jsonify(answer.to_json()), 201, \
         {'Location': url_for('api.get_answer', id=answer.id,
                              _external=True)}
+
+#这个配合前端的_posts.html中的ajax getJSON 方法来得到赞同最高的答案的内容和赞同数并且显示出来
+@api.route('/posts/<int:id>/ajax/answers/')
+def get_ajax_post_answers(id):
+    post = Post.query.get_or_404(id)
+    answer = Answer.query.filter_by(post_id=id).order_by(Answer.agreements_num.desc()).first()
+    return jsonify({
+        'answers_body': answer.body,
+        'answer_vote': answer.agreements_num
+    })

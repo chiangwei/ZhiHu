@@ -3,6 +3,7 @@
 <div class="explore-feed feed-item" data-offset="1" data-za-module="AnswerItem" data-za-index="">
 <h2><a class="question_link" href="{{ url_for('.post', id=post.id) }}" target="_blank" data-id="17837366" data-za-element-name="Title">
 {{ post.title }}
+
 </a></h2>
 <div tabindex="-1" class="zm-item-answer " itemscope="" itemtype="http://schema.org/Answer" data-aid="71319290" data-atoken="226868219" data-collapsed="0" data-created="1504795954" data-deleted="0" data-isowner="0" data-helpful="1" data-copyable="1" data-zop="">
 <link itemprop="url" href="/question/64028409/answer/226868219">
@@ -11,7 +12,7 @@
 <a class="zg-anchor-hidden" name="answer-71319290"></a>
 
 <div class="zm-item-vote">
-<a class="zm-item-vote-count js-expand js-vote-count" href="javascript:;" data-bind-votecount="">6519</a>
+<a class="answer_vote_count_{{ post.id }}" href="javascript:;" data-bind-votecount=""></a>
 </div>
 
 <div class="zm-votebar" data-za-module="VoteBar">
@@ -63,16 +64,38 @@
 
 <div class="zh-summary summary clearfix">
 
+{#
 {% if post.body_html %}
     {{ post.body_html | safe }}
 {% else %}
     {{ post.body }}
 {% endif %}
+{#
 
-<a href="{{ url_for('.post', id=post.id) }}" class="toggle-expand">显示全部</a>
+{#
+{%  for a in post.answers %}
+    {{ a.body }}
+{% endfor %}
+#}
+
+{#
+上面这两个显示问题内容和答案内容的不用了，用下面的ajax getJSON 方法来配合api取到赞同最高的答案的内容和赞同数并且显示出来
+#}
+
+<a href="{{ url_for('.post', id=post.id) }}" class="{{ post.id }}"></a>
 
 </div>
+<script>
 
+    $(document).ready(function(){
+        $.getJSON("{{ url_for('api.get_ajax_post_answers', id=post.id) }}",function(result){
+			$(".{{ post.id }}").append('<span class="themostpopularanswer">' + result["answers_body"] + '</span>');
+			$(".answer_vote_count_{{ post.id }}").append(result["answer_vote"]);
+
+		});
+    })
+
+</script>
 
 
 <p class="visible-expanded"><a itemprop="url" class="answer-date-link meta-item" data-tooltip="s$t$发布于 2017-09-07" target="_blank" href="/question/64028409/answer/226868219">编辑于 2017-09-07</a></p>

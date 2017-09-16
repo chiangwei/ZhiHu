@@ -405,7 +405,7 @@ class Answer(db.Model):
     __tablename__ = 'answers'
     id = db.Column(db.Integer, primary_key = True)
     body = db.Column(db.Text)
-    body.html = db.Column(db.Text)
+    body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -431,6 +431,18 @@ class Answer(db.Model):
         target.body_html = bleach.linkify(bleach.clean(
             markdown(value, output_format='html'),
             tags=allowed_tags, strip=True))
+
+    def to_json(self):
+        json_answer = {
+            'url':url_for('api.get_answer', id=self.id, _external=True),
+            'post':url_for('api.get_post', id=self.post_id, _external=True),
+            'body':self.body,
+            'body_html':self.body_html,
+            'timestramp':self.timestamp,
+            'author':url_for('api.get_user',id=self.author_id, _external=True),
+            'agreements_num':self.agreements_num
+        }
+        return json_answer
 
 db.event.listen(Answer.body, 'set', Answer.on_changed_body)
 
