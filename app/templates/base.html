@@ -18,14 +18,11 @@
 <div class="navbar" role="navigation">
     <div class="container">
 
-
-
 <div role="navigation" class="zu-top" data-za-module="TopNavBar">
 <div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
 <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home" data-za-l="top_navigation_zhihu_logo">知乎</a>
 
 <div class="top-nav-profile dropdown">
-
 
 {% if current_user.is_authenticated %}
 <a href="" class="zu-top-nav-userinfo dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
@@ -77,11 +74,6 @@ style="visibility:hidden" data-count="0">
 
 </div>
 
-
-
-
-
-
 {% if current_user.can(Permission.MODERATE_ANSWERS) %}
 <a href="{{ url_for('main.moderate') }}" class="zu-top-nav-userinfo" id="" data-toggle="">
 <button class="zu-top-add-question" id="zu-top-add-question">
@@ -90,19 +82,14 @@ style="visibility:hidden" data-count="0">
 </a>
 {% endif %}
 
-
 <a href="{{ url_for('main.askquestion') }}" class="zu-top-nav-userinfo" id="" data-toggle="">
 <button class="zu-top-add-question" id="zu-top-add-question">
 提问
 </button>
 </a>
 
-
-
 <div role="search" id="zh-top-search" class="zu-top-search">
 <form method="POST" action="{{ url_for('main.search') }}" id="zh-top-search-form" class="zu-top-search-form">
-
-
 
 <input type="hidden" name="type" value="content">
 <label for="q" class="hide-text">知乎搜索</label><input type="text" class="zu-top-search-input" id="q" name="q" autocomplete="off" value="" maxlength="100" placeholder="搜索你感兴趣的内容...">
@@ -110,16 +97,12 @@ style="visibility:hidden" data-count="0">
 </form>
 </div>
 
-
-
 <div id="zg-top-nav" class="zu-top-nav">
 <ul class="zu-top-nav-ul zg-clear">
 
 <li class="zu-top-nav-li current" id="zh-top-nav-home">
 <a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home" data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
 </li>
-
-
 
 <li class="top-nav-topic-selector zu-top-nav-li " id="zh-top-nav-topic">
 <a class="zu-top-nav-link" href="/topic" id="top-nav-dd-topic">话题</a>
@@ -193,7 +176,6 @@ style="visibility:hidden" data-count="0">
 </div>
 </div>
 
-
 <div class="zu-global-notify" id="zh-global-message" style="display:none">
 <div class="zg-wrap">
 <div class="zu-global-nitify-inner">
@@ -217,37 +199,12 @@ style="visibility:hidden" data-count="0">
     </div>
     {% endfor %}
 
-
-
 <!--知乎正文部分-->
 <div class="zg-wrap zu-main clearfix " role="main">
 <div class="zu-main-content">
 <div class="zu-main-content-inner">
 
-<!--&lt;!&ndash;正文部分start&ndash;&gt;-->
-
-<!--{% include 'zh-recommend.html' %}-->
-
-<!--&lt;!&ndash;正文部分end&ndash;&gt;-->
-
-
 <div class="explore-tab" id="js-explore-tab">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <div class="tab-panel" style="display: block;">
 <!--知乎正文部分-->
@@ -259,7 +216,6 @@ style="visibility:hidden" data-count="0">
 </div>
 </div>
 </div>
-
 
 </div>
 </div>
