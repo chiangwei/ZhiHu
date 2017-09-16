@@ -75,6 +75,6 @@ def get_ajax_post_answers(id):
     post = Post.query.get_or_404(id)
     answer = Answer.query.filter_by(post_id=id).order_by(Answer.agreements_num.desc()).first()
     return jsonify({
-        'answers_body': answer.body,
+        'answers_body': (answer.body)[:176],
         'answer_vote': answer.agreements_num
     })

@@ -56,6 +56,7 @@ def index():
     return render_template('index4.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
 @main.route('/askquestion', methods=['GET','POST'])
+@login_required
 def askquestion():
     # form = PostForm()
     # page = request.args.get('page', 1, type=int)
@@ -200,6 +201,7 @@ def search():
 
 #回答问题
 @main.route('/post/<int:id>',methods=['GET','POST'])
+@login_required
 def post(id):
     post = Post.query.get_or_404(id)
     form = AnswerForm()
@@ -225,6 +227,7 @@ def post(id):
 
 #对答案进行评价
 @main.route('/comment/<int:id>',methods=['GET','POST'])
+@login_required
 def comment(id):
     answer = Answer.query.get_or_404(id)
     form = CommentForm()
@@ -292,6 +295,7 @@ def unfollow(id):
 
 #“关注者”路由和视图函数
 @main.route('/followers/<username>')
+@login_required
 def followers(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
@@ -308,6 +312,7 @@ def followers(username):
                            follows=follows)
 
 @main.route('/followed-by/<username>')
+@login_required
 def followed_by(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
@@ -325,6 +330,7 @@ def followed_by(username):
 
 #点赞
 @main.route('/agree/<id>')
+@login_required
 def agree(id):
     answer = Answer.query.filter_by(id=id).first()
     if answer is None:
@@ -339,6 +345,7 @@ def agree(id):
 
 #取消点赞
 @main.route('/unagree/<id>')
+@login_required
 def unagree(id):
     answer = Answer.query.filter_by(id=id).first()
     if answer is None:
