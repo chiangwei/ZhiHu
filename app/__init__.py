@@ -7,6 +7,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_pagedown import PageDown
 import flask_whooshalchemyplus
+from flask_cache import Cache
 
 #构造文件导入了大多数正在使用的 Flask 扩展。由于尚未初始化所需的程序实例，所以没有初始化扩展，创建扩展类时没有向构造函数传入参数。
 mail = Mail()
@@ -19,9 +20,9 @@ login_manager.session_protection = 'strong'
 #login_view 属性设置登录页面的端点。登录路由在蓝本auth中定义，因此要在前面加上蓝本的名字auth。
 login_manager.login_view = 'auth.login'
 
-
-
 db = SQLAlchemy()
+
+cache = Cache()
 
 #create_app() 函数就是程序的工厂函数，接受一个参数，是程序使用的配置名
 def create_app(config_name):
@@ -48,6 +49,8 @@ def create_app(config_name):
     pagedown.init_app(app)
 
     flask_whooshalchemyplus.init_app(app)
+
+    cache.init_app(app)
 
     #工厂函数返回创建的程序示例
     return app

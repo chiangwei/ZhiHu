@@ -2,13 +2,14 @@ from flask import render_template, redirect, request, url_for, flash, abort,curr
 from flask_login import login_user,logout_user,login_required,current_user
 from ..models import User,Permission,Post,Role,Comment,Answer
 from .forms import PostForm, EditProfileForm, EditProfileAdminForm,CommentForm,AskQuestionForm,AnswerForm
-from .. import db
+from .. import db, cache
 from . import main
 from ..decorators import admin_required, permission_required
 
 @main.route('/', methods=['GET','POST'])
+@cache.cached(timeout=300)
 def index():
-
+    print("index called")
     # for i in (Post.query.outerjoin(Post.answers).order_by(Post.timestamp.desc()).order_by(Answer.agreements_num.asc()).all()):
     #     for a in i.answers:
     #         print(a.body)

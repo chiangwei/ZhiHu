@@ -22,6 +22,8 @@ class Config:
 
     WHOOSH_BASE = os.path.join(basedir, 'WHOOSH_BASE_INDEX')
 
+    CACHE_TYPE = 'simple'
+
     #配置类可以定义 init_app() 类方法，其参数是程序实例。在这个方法中，可以执行对当前环境的配置初始化。现在，基类 Config 中的 init_app() 方法为空
     @staticmethod
     def init_app(app):
