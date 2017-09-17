@@ -21,7 +21,7 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
 db = SQLAlchemy()
-
+#缓存
 cache = Cache()
 
 #create_app() 函数就是程序的工厂函数，接受一个参数，是程序使用的配置名
