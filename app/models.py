@@ -342,7 +342,7 @@ def load_user(user_id):
 #文章内容模型
 class Post(db.Model):
     __tablename__ = 'posts'
-    __searchable__ = ['title']
+    __searchable__ = ['title','body']
     __analyzer__ = ChineseAnalyzer()
 
     id = db.Column(db.Integer,primary_key=True)
