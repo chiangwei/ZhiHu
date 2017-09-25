@@ -5,7 +5,7 @@
 
 {% block page_content %}
 <div class="page-header">
-    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
+    <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=165) }}">
     <div class="profile-header">
         <p style="font-size:40px">{{ user.username }}</p>
         {% if user.name or user.location %}
@@ -17,12 +17,12 @@
         </p>
         {% endif %}
         {% if current_user.is_administrator() %}
-        <p><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
+        <p><b>注册邮箱：</b><a href="mailto:{{ user.email }}">{{ user.email }}</a></p>
         {% endif %}
         {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
         <p>
-            注册时间 {{ moment(user.member_since).format('L') }}.
-            上次登录 {{ moment(user.last_seen).fromNow() }}.
+            <b>注册时间: </b>{{ moment(user.member_since).format('L') }}.
+            <b>上次登录: </b>{{ moment(user.last_seen).fromNow() }}.
         </p>
 
         <p>
@@ -33,8 +33,8 @@
                 <a href="{{ url_for('.unfollow', id=user.id) }}" class="btn btn-default">Unfollow</a>
                 {% endif %}
             {% endif %}
-            <a href="{{ url_for('.followers', username=user.username) }}">粉丝: <span class="badge">{{ user.followers.count() }}</span></a>
-            <a href="{{ url_for('.followed_by', username=user.username) }}">关注: <span class="badge">{{ user.followed.count() }}</span></a>
+            <a href="{{ url_for('.followers', username=user.username) }}"><b>关注者: </b><span class="badge">{{ user.followers.count() }}</span></a>
+            <a href="{{ url_for('.followed_by', username=user.username) }}"><b>关注了: </b><span class="badge">{{ user.followed.count() }}</span></a>
             {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
             | <span class="label label-default">Follows you</span>
             {% endif %}
@@ -50,7 +50,7 @@
 
     </div>
     <p>{{ user.posts.count() }} 提问. {{ user.comments.count() }} 评论.</p>
-    <div>{% include '_posts.html' %}</div>
-</div>
 
+</div>
+<div>{% include '_posts.html' %}</div>
 {% endblock %}

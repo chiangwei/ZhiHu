@@ -1,4 +1,4 @@
-from flask import jsonify, request, g, url_for, current_app
+from flask import jsonify, request, g, url_for, current_app, make_response
 from .. import db
 from ..models import Post, Permission, Answer
 from . import api
@@ -73,8 +73,11 @@ def new_post_answer(id):
 @api.route('/posts/<int:id>/ajax/answers/')
 def get_ajax_post_answers(id):
     post = Post.query.get_or_404(id)
-    answer = Answer.query.filter_by(post_id=id).order_by(Answer.agreements_num.desc()).first()
-    return jsonify({
-        'answers_body': (answer.body)[:176],
-        'answer_vote': answer.agreements_num
-    })
+    answer = (Answer.query.filter_by(post_id=id).order_by(Answer.agreements_num.desc())).first()
+    try:
+        return jsonify({
+            'answers_body': (answer.body)[:176],
+            'answer_vote': answer.agreements_num
+        })
+    except:
+        return make_response("404")

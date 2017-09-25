@@ -2,13 +2,14 @@ from flask import render_template, redirect, request, url_for, flash, abort,curr
 from flask_login import login_user,logout_user,login_required,current_user
 from ..models import User,Permission,Post,Role,Comment,Answer
 from .forms import PostForm, EditProfileForm, EditProfileAdminForm,CommentForm,AskQuestionForm,AnswerForm
-from .. import db
+from .. import db, cache
 from . import main
 from ..decorators import admin_required, permission_required
 
 @main.route('/', methods=['GET','POST'])
+@cache.cached(timeout=300,key_prefix='index')#设置一个key_prefix来作为标记，然后，在内容更新的函数里面调用cache.delete('index')来删除缓存来保证用户访问到的内容是最新的
 def index():
-
+    print("index called")
     # for i in (Post.query.outerjoin(Post.answers).order_by(Post.timestamp.desc()).order_by(Answer.agreements_num.asc()).all()):
     #     for a in i.answers:
     #         print(a.body)
@@ -52,7 +53,6 @@ def index():
 
     import flask_whooshalchemyplus
     flask_whooshalchemyplus.index_one_model(Post)
-
     return render_template('index4.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
 @main.route('/askquestion', methods=['GET','POST'])
@@ -95,8 +95,9 @@ def askquestion():
         error_out=False)
     posts = pagination.items
 
-    import flask_whooshalchemyplus
-    flask_whooshalchemyplus.index_one_model(Post)
+    # import flask_whooshalchemyplus
+    # flask_whooshalchemyplus.index_one_model(Post)
+    cache.delete('index')#删除缓存
 
     return render_template('askquestion.html', form=form, posts=posts,show_followed=show_followed, pagination=pagination)
 
@@ -203,6 +204,8 @@ def search():
 @main.route('/post/<int:id>',methods=['GET','POST'])
 @login_required
 def post(id):
+    cache.delete('view//')
+
     post = Post.query.get_or_404(id)
     form = AnswerForm()
     if form.validate_on_submit():
